@@ -119,6 +119,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         if (getSupportLoaderManager() != null) {
             Bundle bundle = new Bundle();
             bundle.putInt(WebUtils.PAGE_ID, pageId);
+            bundle.putString(WebUtils.query,query);
             getSupportLoaderManager().restartLoader(pageId, bundle, this);
         }
     }
@@ -170,7 +171,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         progressDialog = new ProgressDialog(MainActivity.this);
         progressDialog.setMessage(getString(R.string.loading));
         progressDialog.show();
-        String url = WebUtils.baseUrl + WebUtils.API_KEY_END_POINT + "1" + WebUtils.query + "hello" + WebUtils.API_END_POINT;
+        String url = WebUtils.baseUrl + WebUtils.API_KEY_END_POINT + "1" + WebUtils.query + args.getString(WebUtils.query) + WebUtils.API_END_POINT;
         System.out.println(url);
         /*WebUtils.baseUrl + args.getString("currentFilter") + WebUtils.API_KEY_END_POINT + args.getInt(WebUtils.PAGE_ID)*/
         return new NetworkLoader(this, url, NetworkLoader.GET);
@@ -179,7 +180,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     @Override
     public void onLoadFinished(android.support.v4.content.Loader<ServerResponse> loader, ServerResponse data) {
-        System.out.println("I am in On LoadFines");
         if (progressDialog.isShowing()) progressDialog.cancel();
         if (data.getResponseCode() == 200) {
             System.out.println("Data: " + data.getServerResponse());
