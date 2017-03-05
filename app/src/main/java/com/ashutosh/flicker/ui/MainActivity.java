@@ -203,8 +203,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 photoModal.setId(jo.getString("id"));
                 photoModal.setFarm_id(jo.getString("farm"));
                 photoModal.setServer_id(jo.getString("server"));
-                photoModal.setTitle("title");
-                photoModal.setSecret("secret");
+                photoModal.setTitle(jo.getString("title"));
+                photoModal.setSecret(jo.getString("secret"));
                 photoListModal.add(photoModal);
                 photoAdapter.notifyDataSetChanged();
             }
