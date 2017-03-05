@@ -49,6 +49,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     int pageNo = 0;
     private ProgressDialog progressDialog;
     private List<PhotoModal> photoListModal = new ArrayList<>();
+    private String oldQuery;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,9 +108,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     public void onClick(View v) {
         if (v.equals(mIbSearch)) {
             if (mEtSearch.getText().toString().equals("")) {
-                Toast.makeText(getApplicationContext(), "Please Enter your quehry", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Please Enter your query", Toast.LENGTH_LONG).show();
                 return;
             }
+            if (mEtSearch.getText().toString().equals(oldQuery)) {
+                return;
+            }
+
+            oldQuery = mEtSearch.getText().toString();
             makeRequest(1, mEtSearch.getText().toString());
 
         }
@@ -119,7 +125,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         if (getSupportLoaderManager() != null) {
             Bundle bundle = new Bundle();
             bundle.putInt(WebUtils.PAGE_ID, pageId);
-            bundle.putString(WebUtils.query,query);
+            bundle.putString(WebUtils.query, query);
             getSupportLoaderManager().restartLoader(pageId, bundle, this);
         }
     }
@@ -197,6 +203,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     public void parseResult(String s) {
         try {
             JSONArray jsonArray = new JSONObject(s).getJSONObject("photos").getJSONArray("photo");
+            photoListModal.clear();
             for (int i = 0; i < jsonArray.length(); i++) {
                 PhotoModal photoModal = new PhotoModal();
                 JSONObject jo = jsonArray.getJSONObject(i);
