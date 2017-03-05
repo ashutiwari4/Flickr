@@ -179,6 +179,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     @Override
     public void onLoadFinished(android.support.v4.content.Loader<ServerResponse> loader, ServerResponse data) {
+        System.out.println("I am in On LoadFines");
         if (progressDialog.isShowing()) progressDialog.cancel();
         if (data.getResponseCode() == 200) {
             System.out.println("Data: " + data.getServerResponse());
@@ -205,6 +206,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 photoModal.setTitle("title");
                 photoModal.setSecret("secret");
                 photoListModal.add(photoModal);
+                photoAdapter.notifyDataSetChanged();
             }
         } catch (JSONException e) {
             e.printStackTrace();

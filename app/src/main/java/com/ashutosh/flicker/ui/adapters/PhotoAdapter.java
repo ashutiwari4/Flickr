@@ -51,7 +51,6 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ItemHolder> 
 
     @Override
     public void onBindViewHolder(PhotoAdapter.ItemHolder holder, int position) {
-
         holder.setItem(itemsName.get(position), context, position);
     }
 
@@ -97,7 +96,8 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ItemHolder> 
         public void setItem(PhotoModal itemObject, Context context, int position) {
             this.movieData = itemObject;
             String url = WebUtils.imageBaseUrl + itemObject.getFarm_id() + ".staticflickr.com/" + itemObject.getId() + "_" + itemObject.getSecret() + ".jpg";
-            Glide.with(context).load(url).placeholder(R.drawable.placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(ivItem);
+            System.out.println(url);
+            Glide.with(context).load(url).placeholder(R.drawable.placeholder).error(R.drawable.placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(ivItem);
         }
 
         @Override
