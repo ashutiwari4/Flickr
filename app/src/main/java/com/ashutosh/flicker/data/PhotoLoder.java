@@ -11,18 +11,15 @@ import android.content.CursorLoader;
 public class PhotoLoder extends CursorLoader {
     public static int count = 10;
 
-    public static PhotoLoder newAllArticlesInstance(Context context, int pageNo) {
-        System.out.println("Local data page no " + pageNo);
-        return new PhotoLoder(context, PhotoContract.Photos.buildDirUri(), 0, pageNo * count);
+    public static PhotoLoder newAllArticlesInstance(Context context) {
+        return new PhotoLoder(context, PhotoContract.Photos.buildDirUri());
     }
 
     public static PhotoLoder newInstanceForItemId(Context context, long itemId) {
         return new PhotoLoder(context, PhotoContract.Photos.buildItemUri(itemId));
     }
 
-    private PhotoLoder(Context context, Uri uri, int start, int end) {
-        super(context, uri, Query.PROJECTION, null, null, " limit " + start + "," + end);
-    }
+
 
     private PhotoLoder(Context context, Uri uri) {
         super(context, uri, Query.PROJECTION, null, null,null);
@@ -32,7 +29,6 @@ public class PhotoLoder extends CursorLoader {
         String[] PROJECTION = {
                 PhotoContract.PhotoColumns._ID,
                 PhotoContract.PhotoColumns.PREDICATE,
-                PhotoContract.PhotoColumns.SECRET,
                 PhotoContract.PhotoColumns.PHOTO_URL,
 
         };

@@ -23,12 +23,6 @@ public class PhotoContract {
         /**
          * Type: TEXT NOT NULL
          */
-        String SECRET = "thumb_url";
-        String SERVER_ID = "server_id";
-        String FARM_ID = "farm_id";
-        /**
-         * Type: TEXT NOT NULL
-         */
         String PHOTO_URL = "photo_url";
     }
 

@@ -12,12 +12,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.ashutosh.flicker.R;
 import com.ashutosh.flicker.app.BaseActivity;
 import com.ashutosh.flicker.data.MyLocalServer;
+import com.ashutosh.flicker.data.PhotoLoder;
 import com.ashutosh.flicker.modals.PhotoModal;
 import com.ashutosh.flicker.remote.NetworkLoader;
 import com.ashutosh.flicker.remote.ServerResponse;
@@ -36,6 +36,9 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends BaseActivity implements View.OnClickListener, PhotoAdapter.OnItemClickListener, LoaderManager.LoaderCallbacks<ServerResponse> {
 
+    public static final int CHECK_DATA = 0x001;
+    public static final int UPDATE_DATA = 0x002;
+
     @BindView(R.id.etSearch)
     EditText mEtSearch;
     @BindView(R.id.ibSearch)
@@ -46,7 +49,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
 
     private PhotoAdapter photoAdapter;
     private boolean loadingMore = false;
-    int pageNo = 0;
+    int pageNo = 1;
     private ProgressDialog progressDialog;
     private List<PhotoModal> photoListModal = new ArrayList<>();
     private String oldQuery;
@@ -83,7 +86,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                         return;
                     loadingMore = true;
                     pageNo += 1;
-                    makeRequest(pageNo,oldQuery);
+                    makeRequest(pageNo, oldQuery);
                 }
             }
         });
@@ -96,13 +99,6 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                         .setAction("Action", null).show();
             }
         });
-    }
-
-    private void getLocalData() {
-        Bundle b = new Bundle();
-        pageNo += 1;
-        b.putInt("page_no", pageNo);
-        getSupportLoaderManager().restartLoader(0, b, this);
     }
 
 
@@ -118,7 +114,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             }
             photoListModal.clear();
             oldQuery = mEtSearch.getText().toString();
-            makeRequest(1, mEtSearch.getText().toString());
+            Bundle b = new Bundle();
+            getLoaderManager().restartLoader(CHECK_DATA, b, localDataLoder);
 
         }
     }
@@ -128,58 +125,53 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             Bundle bundle = new Bundle();
             bundle.putInt(WebUtils.PAGE_ID, pageId);
             bundle.putString(WebUtils.query, query);
-            getSupportLoaderManager().restartLoader(pageId, bundle, this);
+            getSupportLoaderManager().restartLoader(UPDATE_DATA, bundle, this);
         }
     }
 
 
-
-   /* @Override
-    public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        AppPreferences.getInstance(this).setPageNo(args.getInt("page_no"));
-        return PhotoLoder.newAllArticlesInstance(MainActivity.this, args.getInt("page_no"));
-    }
-*/
-   /* @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
-        Cursor cursor = ((PhotoAdapter) mRvPhoto.getAdapter()).getCursor();
-        if (cursor != null)
-            pageNo = cursor.getCount() / 10;
-        MatrixCursor mx = new MatrixCursor(PhotoLoder.Query.PROJECTION);
-        fillMx(cursor, mx);
-        fillMx(data, mx);
-
-        ((PhotoAdapter) mRvPhoto.getAdapter()).swapCursor(data);
-        toggleProgressbar(progressBar, mRvPhoto);
-        loadingMore = false;
-    }*/
-
-
-
-
-   /* private void fillMx(Cursor data, MatrixCursor mx) {
-        if (data == null)
-            return;
-
-        data.moveToPosition(-1);
-        while (data.moveToNext()) {
-            mx.addRow(new Object[]{
-                    data.getString(data.getColumnIndex(PhotoContract.Photos._ID)),
-                    data.getString(data.getColumnIndex(PhotoContract.Photos.PREDICATE)),
-                    data.getString(data.getColumnIndex(PhotoContract.Photos.COMPOSER)),
-                    data.getString(data.getColumnIndex(PhotoContract.Photos.TAB_AND_CHORD)),
-                    data.getString(data.getColumnIndex(PhotoContract.Photos.SECRET)),
-            });
+    private android.app.LoaderManager.LoaderCallbacks<Cursor> localDataLoder
+            = new android.app.LoaderManager.LoaderCallbacks<Cursor>() {
+        @Override
+        public android.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
+            return PhotoLoder.newAllArticlesInstance(MainActivity.this);
         }
-    }*/
 
+        @Override
+        public void onLoadFinished(android.content.Loader<Cursor> loader, Cursor data) {
+            data.moveToFirst();
+            if (data.getCount() == 0) {
+                pageNo = 1;
+                makeRequest(pageNo, mEtSearch.getText().toString());
+            } else {
+                photoListModal.clear();
+                getSnackBar(Snackbar.LENGTH_SHORT, getString(R.string.looking_locally), null).show();
+                for (int i = 0; i < data.getCount(); i++) {
+                    PhotoModal pm = new PhotoModal();
+                    pm.setId(data.getString(0));
+                    pm.setTitle(data.getString(1));
+                    pm.setPhotoUrl(data.getString(2));
+                    data.moveToNext();
+                    photoListModal.add(pm);
+                }
+                photoAdapter.notifyDataSetChanged();
+
+            }
+        }
+
+        @Override
+        public void onLoaderReset(android.content.Loader<Cursor> loader) {
+
+        }
+    };
 
     @Override
     public android.support.v4.content.Loader<ServerResponse> onCreateLoader(int id, Bundle args) {
         progressDialog = new ProgressDialog(MainActivity.this);
+
         progressDialog.setMessage(getString(R.string.loading));
         progressDialog.show();
-        String url = WebUtils.baseUrl + WebUtils.API_KEY_END_POINT + "1" + WebUtils.query + args.getString(WebUtils.query) + WebUtils.API_END_POINT;
+        String url = WebUtils.baseUrl + WebUtils.API_KEY_END_POINT + pageNo + WebUtils.query + args.getString(WebUtils.query) + WebUtils.API_END_POINT;
         System.out.println(url);
         /*WebUtils.baseUrl + args.getString("currentFilter") + WebUtils.API_KEY_END_POINT + args.getInt(WebUtils.PAGE_ID)*/
         return new NetworkLoader(this, url, NetworkLoader.GET);
@@ -211,13 +203,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 PhotoModal photoModal = new PhotoModal();
                 JSONObject jo = jsonArray.getJSONObject(i);
                 photoModal.setId(jo.getString("id"));
-                photoModal.setFarm_id(jo.getString("farm"));
-                photoModal.setServer_id(jo.getString("server"));
                 photoModal.setTitle(jo.getString("title"));
-                photoModal.setSecret(jo.getString("secret"));
+                String url = WebUtils.imageBaseUrl + jo.getString("farm") + ".staticflickr.com/" + jo.getString("server") + "/" + jo.getString("id") + "_" + jo.getString("secret") + ".jpg";
+                photoModal.setPhotoUrl(url);
+
                 photoListModal.add(photoModal);
-                photoAdapter.notifyDataSetChanged();
             }
+            photoAdapter.notifyDataSetChanged();
         } catch (JSONException e) {
             e.printStackTrace();
         }

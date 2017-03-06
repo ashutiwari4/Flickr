@@ -24,7 +24,7 @@ public class MyLocalServer {
     private static final int ITEM_COUNT_IN_PAGE = 5;
 
     public MyLocalServer(Context context, List<PhotoModal> photoListModel) {
-        //updateDatabase(context, photoListModel);
+        updateDatabase(context, photoListModel);
     }
 
 
@@ -44,9 +44,7 @@ public class MyLocalServer {
                 PhotoModal songsModel = photoListModel.get(i);
                 values.put(PhotoContract.Photos._ID, songsModel.getId());
                 values.put(PhotoContract.Photos.PREDICATE, songsModel.getTitle());
-                values.put(PhotoContract.Photos.SECRET, songsModel.getServer_id());
-                values.put(PhotoContract.Photos.FARM_ID, songsModel.getFarm_id());
-                values.put(PhotoContract.Photos.SERVER_ID, songsModel.getServer_id());
+                values.put(PhotoContract.Photos.PHOTO_URL,songsModel.getPhotoUrl());
                 cpo.add(ContentProviderOperation.newInsert(dirUri).withValues(values).build());
             }
 

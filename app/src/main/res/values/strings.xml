@@ -1,6 +1,8 @@
 <resources>
-    <string name="app_name">Flicker</string>
-    <string name="action_settings">Settings</string>
-    <string name="loading">Loading...</string>
-    <string name="no_data_available">No Data available!</string>
+	<string name="app_name">Flicker</string>
+	<string name="action_settings">Settings</string>
+	<string name="checking_local_data">Checking query locally</string>
+	<string name="loading">Loading...</string>
+	<string name="no_data_available">No Data available!</string>
+	<string name="looking_locally">Fetching data locally...</string>
 </resources>

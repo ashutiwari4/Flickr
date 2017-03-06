@@ -6,22 +6,14 @@ package com.ashutosh.flicker.modals;
 
 public class PhotoModal {
 
-    private String id, farm_id,server_id,title, secret, owner;
+    private String id, title, photoUrl;
 
-    public String getFarm_id() {
-        return farm_id;
+    public String getPhotoUrl() {
+        return photoUrl;
     }
 
-    public void setFarm_id(String farm_id) {
-        this.farm_id = farm_id;
-    }
-
-    public String getServer_id() {
-        return server_id;
-    }
-
-    public void setServer_id(String server_id) {
-        this.server_id = server_id;
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
     }
 
     public String getId() {
@@ -40,19 +32,5 @@ public class PhotoModal {
         this.title = title;
     }
 
-    public String getSecret() {
-        return secret;
-    }
 
-    public void setSecret(String secret) {
-        this.secret = secret;
-    }
-
-    public String getOwner() {
-        return owner;
-    }
-
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
 }
