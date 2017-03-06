@@ -82,6 +82,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                     if (loadingMore)
                         return;
                     loadingMore = true;
+                    pageNo += 1;
+                    makeRequest(pageNo,oldQuery);
                 }
             }
         });
@@ -96,12 +98,12 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
         });
     }
 
-   /* private void getLocalData() {
+    private void getLocalData() {
         Bundle b = new Bundle();
         pageNo += 1;
         b.putInt("page_no", pageNo);
-        getLoaderManager().restartLoader(0, b, this);
-    }*/
+        getSupportLoaderManager().restartLoader(0, b, this);
+    }
 
 
     @Override
@@ -114,7 +116,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             if (mEtSearch.getText().toString().equals(oldQuery)) {
                 return;
             }
-
+            photoListModal.clear();
             oldQuery = mEtSearch.getText().toString();
             makeRequest(1, mEtSearch.getText().toString());
 
@@ -192,6 +194,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             parseResult(data.getServerResponse());
             mEtSearch.setText("");
             new MyLocalServer(MainActivity.this, photoListModal);
+            loadingMore = false;
         } else if (data.getServerResponse() == null || data.getServerResponse().equals("")) {
             Toast.makeText(getApplicationContext(), getString(R.string.no_data_available), Toast.LENGTH_LONG).show();
         } else {
@@ -203,7 +206,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     public void parseResult(String s) {
         try {
             JSONArray jsonArray = new JSONObject(s).getJSONObject("photos").getJSONArray("photo");
-            photoListModal.clear();
+
             for (int i = 0; i < jsonArray.length(); i++) {
                 PhotoModal photoModal = new PhotoModal();
                 JSONObject jo = jsonArray.getJSONObject(i);
