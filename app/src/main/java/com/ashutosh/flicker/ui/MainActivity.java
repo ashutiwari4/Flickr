@@ -81,7 +81,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                 int lastVisibleItemPosition = layoutManager.findLastVisibleItemPosition();
                 int maxPositions = layoutManager.getItemCount();
 
-                if (lastVisibleItemPosition == maxPositions - 1) {
+                if (photoListModal.size() > 5 && lastVisibleItemPosition == maxPositions - 1) {
                     if (loadingMore)
                         return;
                     loadingMore = true;
@@ -106,16 +106,16 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     public void onClick(View v) {
         if (v.equals(mIbSearch)) {
             if (mEtSearch.getText().toString().equals("")) {
-                Toast.makeText(getApplicationContext(), "Please Enter your query", Toast.LENGTH_LONG).show();
+                getSnackBar(Snackbar.LENGTH_SHORT, getString(R.string.please_enter_your_query), null).show();
                 return;
             }
             if (mEtSearch.getText().toString().equals(oldQuery)) {
+                getSnackBar(Snackbar.LENGTH_SHORT, getString(R.string.scroll_down_to_find_better_result), null).show();
                 return;
             }
             photoListModal.clear();
             oldQuery = mEtSearch.getText().toString();
-            Bundle b = new Bundle();
-            getLoaderManager().restartLoader(CHECK_DATA, b, localDataLoder);
+            getLoaderManager().initLoader(CHECK_DATA, null, localDataLoder);
 
         }
     }
@@ -134,12 +134,13 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             = new android.app.LoaderManager.LoaderCallbacks<Cursor>() {
         @Override
         public android.content.Loader<Cursor> onCreateLoader(int id, Bundle args) {
-            return PhotoLoder.newAllArticlesInstance(MainActivity.this);
+            return PhotoLoder.newAllArticlesInstance(MainActivity.this, oldQuery);
         }
 
         @Override
         public void onLoadFinished(android.content.Loader<Cursor> loader, Cursor data) {
             data.moveToFirst();
+            System.out.println("Local data check.....");
             if (data.getCount() == 0) {
                 pageNo = 1;
                 makeRequest(pageNo, mEtSearch.getText().toString());
@@ -155,8 +156,8 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
                     photoListModal.add(pm);
                 }
                 photoAdapter.notifyDataSetChanged();
-
             }
+            getLoaderManager().destroyLoader(CHECK_DATA);
         }
 
         @Override
@@ -168,12 +169,11 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
     @Override
     public android.support.v4.content.Loader<ServerResponse> onCreateLoader(int id, Bundle args) {
         progressDialog = new ProgressDialog(MainActivity.this);
-
         progressDialog.setMessage(getString(R.string.loading));
         progressDialog.show();
+        getSnackBar(Snackbar.LENGTH_SHORT, getString(R.string.no_local_data_found), null).show();
         String url = WebUtils.baseUrl + WebUtils.API_KEY_END_POINT + pageNo + WebUtils.query + args.getString(WebUtils.query) + WebUtils.API_END_POINT;
         System.out.println(url);
-        /*WebUtils.baseUrl + args.getString("currentFilter") + WebUtils.API_KEY_END_POINT + args.getInt(WebUtils.PAGE_ID)*/
         return new NetworkLoader(this, url, NetworkLoader.GET);
     }
 
@@ -185,7 +185,7 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             System.out.println("Data: " + data.getServerResponse());
             parseResult(data.getServerResponse());
             mEtSearch.setText("");
-            new MyLocalServer(MainActivity.this, photoListModal);
+
             loadingMore = false;
         } else if (data.getServerResponse() == null || data.getServerResponse().equals("")) {
             Toast.makeText(getApplicationContext(), getString(R.string.no_data_available), Toast.LENGTH_LONG).show();
@@ -202,14 +202,14 @@ public class MainActivity extends BaseActivity implements View.OnClickListener, 
             for (int i = 0; i < jsonArray.length(); i++) {
                 PhotoModal photoModal = new PhotoModal();
                 JSONObject jo = jsonArray.getJSONObject(i);
-                photoModal.setId(jo.getString("id"));
-                photoModal.setTitle(jo.getString("title"));
+                photoModal.setId(jo.getString("secret"));
+                photoModal.setTitle(oldQuery);
                 String url = WebUtils.imageBaseUrl + jo.getString("farm") + ".staticflickr.com/" + jo.getString("server") + "/" + jo.getString("id") + "_" + jo.getString("secret") + ".jpg";
                 photoModal.setPhotoUrl(url);
-
                 photoListModal.add(photoModal);
             }
             photoAdapter.notifyDataSetChanged();
+            new MyLocalServer(MainActivity.this, photoListModal);
         } catch (JSONException e) {
             e.printStackTrace();
         }

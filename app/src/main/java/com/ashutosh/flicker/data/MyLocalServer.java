@@ -36,15 +36,12 @@ public class MyLocalServer {
             ArrayList<ContentProviderOperation> cpo = new ArrayList<ContentProviderOperation>();
             Uri dirUri = PhotoContract.Photos.buildDirUri();
             //TODO
-            //cpo.add(ContentProviderOperation.newDelete(dirUri).build());
-
-
             for (int i = 0; i < photoListModel.size(); i++) {
                 ContentValues values = new ContentValues();
-                PhotoModal songsModel = photoListModel.get(i);
-                values.put(PhotoContract.Photos._ID, songsModel.getId());
-                values.put(PhotoContract.Photos.PREDICATE, songsModel.getTitle());
-                values.put(PhotoContract.Photos.PHOTO_URL,songsModel.getPhotoUrl());
+                PhotoModal photoModel = photoListModel.get(i);
+                values.put(PhotoContract.Photos._ID, photoModel.getId());
+                values.put(PhotoContract.Photos.PREDICATE, photoModel.getTitle());
+                values.put(PhotoContract.Photos.PHOTO_URL,photoModel.getPhotoUrl());
                 cpo.add(ContentProviderOperation.newInsert(dirUri).withValues(values).build());
             }
 
@@ -52,12 +49,5 @@ public class MyLocalServer {
         } catch (RemoteException | OperationApplicationException e) {
             Log.e(getClass().getSimpleName(), "Error updating content.", e);
         }
-        sendMessage(context);
-    }
-
-
-    private void sendMessage(Context context) {
-        Intent intent = new Intent("database_reloaded");
-        LocalBroadcastManager.getInstance(context).sendBroadcast(intent);
     }
 }

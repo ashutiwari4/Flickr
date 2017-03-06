@@ -95,7 +95,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ItemHolder> 
 
         public void setItem(PhotoModal itemObject, Context context, int position) {
             this.movieData = itemObject;
-            Glide.with(context).load(itemObject.getPhotoUrl()).placeholder(R.drawable.placeholder).error(R.drawable.placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(ivItem);
+            Glide.with(context).load(itemObject.getPhotoUrl()).placeholder(R.drawable.placeholder).centerCrop().error(R.drawable.placeholder).diskCacheStrategy(DiskCacheStrategy.ALL).into(ivItem);
         }
 
         @Override

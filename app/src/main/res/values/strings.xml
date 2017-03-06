@@ -4,5 +4,8 @@
 	<string name="checking_local_data">Checking query locally</string>
 	<string name="loading">Loading...</string>
 	<string name="no_data_available">No Data available!</string>
-	<string name="looking_locally">Fetching data locally...</string>
+	<string name="no_local_data_found">No Local Data found! Looking on server..</string>
+	<string name="looking_locally">Local Data found ...</string>
+	<string name="scroll_down_to_find_better_result">Please scroll down to see more result for this query.</string>
+	<string name="please_enter_your_query">Please enter your query.</string>
 </resources>

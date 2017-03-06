@@ -9,8 +9,8 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 
 public class DataBase extends SQLiteOpenHelper {
-    private static final String DATABASE_NAME = "letsplay.db";
-    private static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "flicker.db";
+    private static final int DATABASE_VERSION = 4;
 
     public DataBase(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -19,12 +19,10 @@ public class DataBase extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL("CREATE TABLE " + PhotoProvider.Tables.PHOTO_TABLE + " ("
-                + PhotoContract.PhotoColumns._ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + PhotoContract.PhotoColumns._ID + " TEXT,"
                 + PhotoContract.PhotoColumns.PREDICATE + " TEXT NOT NULL,"
                 + PhotoContract.PhotoColumns.PHOTO_URL + " TEXT NOT NULL"
                 + ")");
-
-
     }
 
     @Override

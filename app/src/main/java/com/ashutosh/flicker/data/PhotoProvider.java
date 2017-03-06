@@ -77,11 +77,11 @@ public class PhotoProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
         switch (match) {
             case ITEMS: {
-                final long _id = db.insertWithOnConflict(Tables.PHOTO_TABLE, null, values, SQLiteDatabase.CONFLICT_IGNORE);
-                if (_id == -1) {
+                final long _id = db.insert(Tables.PHOTO_TABLE, null, values);
+                /*if (_id == -1) {
                     System.out.println("Updating data");
                     db.update(Tables.PHOTO_TABLE, values, "_id=?", new String[]{values.getAsString(PhotoContract.PhotoColumns._ID)});
-                } else System.out.println("Inserting data");
+                } else System.out.println("Inserting data");*/
                 getContext().getContentResolver().notifyChange(uri, null);
                 return PhotoContract.Photos.buildItemUri(_id);
             }
